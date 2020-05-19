@@ -1,40 +1,23 @@
 ---
 
-#Create Job Template
-- name: Add Tower Workflow Templates
-  awx.awx.tower_workflow_template:
+- name: Create Workflow
+  awx.awx.tower_workflow_job_template:
+    description: "{{ item.description }}"
     name: "{{ item.name }}"
-    #new_name: "{{ item.new_name | default(omit) }}"
-    description: "{{ item.description | default('') }}"
     organization: "{{ item.organization }}"
-    ask_extra_vars: "{{ item.ask_variables_on_launch | default(false) }}"
+    ask_variables_on_launch: "{{ item.ask_variables_on_launch | default(false) }}" ## only supported starting from Ansible 2.9
+    extra_vars: "{{ item.extra_vars | to_json | default(omit) }}"
     state: present
-    schema: "{{ item.schema }}"
     survey_enabled: "{{ item.survey_enabled }}"
     survey: "{{ item.survey | to_json }}"    
-    tower_username: "{{ tower_username | default(omit) }}"
-    tower_password: "{{ tower_password | default(omit) }}"    
-    #tower_oauthtoken: "{{ tower_oauthtoken | default(omit) }}"
+    tower_oauthtoken: "{{ user_token.json.token }}"
     tower_host: "{{ tower_server }}"
-    tower_verify_ssl: "{{ tower_verify_ssl | default('yes') }}"
+    tower_verify_ssl: no
   with_items: "{{ tower_workflows }}"
-  register: workflow_items_create 
-  no_log: "{{ tower_genie_workflow_secure_logging }}"
 
-- name: Create extra_vars for workflows
-  uri:
-    url: "https://{{ tower_server }}/api/v2/workflow_job_templates/{{item.id}}/"
-    method: PUT
-    user: "{{ username }}"
-    password: "{{ password }}"
-    body:
-      name: "{{ item.item.name }}"
-      extra_vars: "{{ item.item.extra_vars[env_type] | to_yaml }}"  
-      survey_enabled: "{{ item.item.survey_enabled }}"
-      ask_variables_on_launch: "{{ item.item.ask_variables_on_launch | default(false) }}"
-    force_basic_auth: yes
-    status_code: 201, 200
-    body_format: json  
-    validate_certs: no
-  with_items: "{{ workflow_items_create.results }}"   
- 
+# Create links between workflow node 
+- name: loop over nodes in schema to add to workflow templates
+  include_tasks: "add_workflows_schemas.yml"
+  loop: "{{ tower_workflows }}"
+  loop_control:
+    loop_var: workflow_loop_var 

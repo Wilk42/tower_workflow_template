@@ -1,60 +1,130 @@
 {
-	"tower_workflows": [{
-			"name": "Complicated Schema Workflow",
-			"description": "Complicated Schema Workflow",
-			"organization": "Default",
-			"schema": [{
-				"job_template": "No Survey Template no vars",
-				"success_nodes": [{
-					"inventory_source": "demo_inventory_source",
-					"always_nodes": [{
-						"job_template": "No Survey Template no vars",
-						"success_nodes": [{
-							"job_template": "No Survey Template no vars",
-							"failure_nodes": [{
-								"job_template": "No Survey Template no vars",
-								"success_nodes": [{
-									"job_template": "No Survey Template no vars"
-								}]
-							}],
-							"success_nodes": [{
-								"job_template": "No Survey Template no vars",
-								"failure_nodes": [{
-									"job_template": "No Survey Template no vars",
-									"success_nodes": [{
-										"job_template": "No Survey Template no vars"
-									}]
-								}],
-								"success_nodes": [{
-										"job_template": "No Survey Template no vars"
-									},
-									{
-										"job_template": "No Survey Template no vars"
-									}
-								]
-							}]
-						}]
-					}]
-				}]
-			}],
-			"survey_enabled": true,
-			"survey": "{{ lookup('template', 'template_surveys/basic_workflow_survey.json') | regex_replace('\\n', '') }}",
-			"extra_vars": "{{ survey_extra_vars }}"
-		},
-		{
-			"name": "Simple workflow schema",
-			"description": "Simple workflow schema",
-			"organization": "Default",
-			"schema": [{
-				"inventory_source": "demo_inventory_source",
-				"success_nodes": [{
-					"job_template": "No Survey Template no vars"
-				}]
-			}],
-			"survey_enabled": false,
-			"survey": {},
-			"ask_variables_on_launch": false,
-			"extra_vars": "{{ empty_master_vars }}"
-		}
+	"workflows": [
+	  {
+		"name": "Complicated Schema Workflow",
+		"description": "Complicated Schema Workflow",
+		"organization": "Default",
+		"schema": [
+					{
+					  "identifier": "Node101",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node201"
+					  ]
+					},
+					{
+					  "identifier": "Node201",
+					  "unified_job_template": "No Survey Template no vars",
+					  "always_nodes": [
+						"Node301"
+					  ]
+					},
+					{
+					  "identifier": "Node301",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node401"
+					  ]
+					},
+					{
+					  "identifier": "Node401",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node501"
+					  ],
+					  "failure_nodes": [
+						"Node502"
+					  ]
+					},
+					{
+					  "identifier": "Node501",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node601",
+						"Node602"
+					  ],
+					  "failure_nodes": [
+						"Node603"
+					  ]
+					},
+					{
+					  "identifier": "Node502",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node604"
+					  ]
+					},
+					{
+					  "identifier": "Node601",
+					  "unified_job_template": "No Survey Template no vars",
+					},
+					{
+					  "identifier": "Node602",
+					  "unified_job_template": "No Survey Template no vars",
+					},
+					{
+					  "identifier": "Node603",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node701"
+					  ]
+					},
+					{
+					  "identifier": "Node604",
+					  "unified_job_template": "No Survey Template no vars",
+					},
+					{
+					  "identifier": "Node701",
+					  "unified_job_template": "No Survey Template no vars",
+					}
+				  ],     
+		"survey_enabled": true,
+		"survey": "{{ lookup('template', 'workflow_surveys/add_evpn_workflow_survey.json') | regex_replace('\\n', '') }}",
+		"extra_vars": "{{ add_evpn_workflow_extravars }}"
+	  },
+	  {
+		"name": "Simple workflow schema",
+		"description": "Workflow for adding an EVPN to ToRs",
+		"organization": "Default",
+		"schema": [
+					{
+					  "identifier": "Validate user Input - Add EVPN",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node201",
+						"Node202"
+					  ],
+					  "failure_nodes": [
+						"Node209"
+					  ]
+					},
+					{
+					  "identifier": "Node201",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node301"
+					  ]
+					},
+					{
+					  "identifier": "Node202",
+					  "unified_job_template": "No Survey Template no vars",
+					  "success_nodes": [
+						"Node301"
+					  ]
+					},
+					{
+					  "identifier": "Node209",
+					  "unified_job_template": "No Survey Template no vars",
+					},
+					{
+					  "identifier": "Node301",
+					  "unified_job_template": "No Survey Template no vars",
+					  "All_parents_must_converge": true
+					}
+				  ],     
+		"survey_enabled": true,
+		"survey": "{{ lookup('template', 'workflow_surveys/add_evpn_workflow_survey.json') | regex_replace('\\n', '') }}",
+		"extra_vars": "{{ add_evpn_workflow_extravars }}"
+	  }
 	]
-}
+  }

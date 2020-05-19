@@ -1,0 +1,27 @@
+# Creating Workflow Node 
+- name : Create the Workfow Node
+  awx.awx.tower_workflow_job_template_node:
+    identifier : "{{item.identifier}}"   # internal identification ID 
+    unified_job_template : "{{item.unified_job_template}}"  # Run Job template 
+    workflow : "{{workflow_loop_var.name}}"        # Workflow job template name to associate with 
+    all_parents_must_converge : "{{item.all_parents_must_converge | default (omit)}}"
+    organization: "{{workflow_loop_var.organization}}"  
+    tower_oauthtoken: "{{ user_token.json.token }}"
+    tower_host: "{{ tower_server }}"
+    tower_verify_ssl: no
+  loop : "{{ workflow_loop_var.schema }}"
+
+# Create links between workflow node 
+- name : Create links between Workflow Nodes 
+  awx.awx.tower_workflow_job_template_node: 
+    identifier: "{{item.identifier}}" 
+    workflow : "{{workflow.Name}}" 
+    always_nodes:  " {{item.always_nodes | default (omit)}} " # Nodes to advance on always 
+    success_nodes: "{{ item.success_nodes | default (omit)}} " # Nodes to advance on success (green links) 
+    failure_nodes: " {{item.failure_nodes | default (omit)}} " # Nodes to advance on failure (red links) 
+    organization: "{{workflow_loop_var.organization}}"
+    tower_oauthtoken: "{{ user_token.json.token }}"
+    tower_host: "{{ tower_server }}"
+    tower_verify_ssl: no
+  loop : "{{ workflow_loop_var.schema }}" 
+  when : (item.success_nodes is defined) or (item.failure_nodes is defined)  or (item.failure_nodes is defined) # Execute only the nodes that define links to the following
