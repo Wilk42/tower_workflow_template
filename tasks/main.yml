@@ -18,4 +18,23 @@
     tower_host: "{{ tower_server }}"
     tower_verify_ssl: "{{ tower_verify_ssl | default('yes') }}"
   with_items: "{{ tower_workflows }}"
+  register: workflow_items_create 
   no_log: "{{ tower_genie_workflow_secure_logging }}"
+
+- name: Create extra_vars for workflows
+  uri:
+    url: "https://{{ tower_server }}/api/v2/workflow_job_templates/{{item.id}}/"
+    method: PUT
+    user: "{{ username }}"
+    password: "{{ password }}"
+    body:
+      name: "{{ item.item.name }}"
+      extra_vars: "{{ item.item.extra_vars[env_type] | to_yaml }}"  
+      survey_enabled: "{{ item.item.survey_enabled }}"
+      ask_variables_on_launch: "{{ item.item.ask_variables_on_launch | default(false) }}"
+    force_basic_auth: yes
+    status_code: 201, 200
+    body_format: json  
+    validate_certs: no
+  with_items: "{{ workflow_items_create.results }}"   
+ 
