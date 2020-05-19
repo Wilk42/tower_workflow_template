@@ -1,0 +1,21 @@
+---
+
+#Create Job Template
+- name: Add Tower Workflow Templates
+  awx.awx.tower_workflow_template:
+    name: "{{ item.name }}"
+    #new_name: "{{ item.new_name | default(omit) }}"
+    description: "{{ item.description | default('') }}"
+    organization: "{{ item.organization }}"
+    ask_extra_vars: "{{ item.ask_variables_on_launch | default(false) }}"
+    state: present
+    schema: "{{ item.schema }}"
+    survey_enabled: "{{ item.survey_enabled }}"
+    survey: "{{ item.survey | to_json }}"    
+    tower_username: "{{ tower_username | default(omit) }}"
+    tower_password: "{{ tower_password | default(omit) }}"    
+    #tower_oauthtoken: "{{ tower_oauthtoken | default(omit) }}"
+    tower_host: "{{ tower_server }}"
+    tower_verify_ssl: "{{ tower_verify_ssl | default('yes') }}"
+  with_items: "{{ tower_workflows }}"
+  no_log: "{{ tower_genie_workflow_secure_logging }}"
